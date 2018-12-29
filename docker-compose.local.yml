@@ -1,0 +1,12 @@
+
+#DOCKER COMPOSE FILE FOR TESTING/DEV LOCAL
+version: '2'
+services:
+  api:
+    build:
+      context: .
+    command: serve -s -p 5000 build
+    expose:
+      - '5000'
+    ports:
+      - '5000:5000'
