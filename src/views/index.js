@@ -22,49 +22,60 @@ class view extends React.Component {
     mode: 'ready'
   }
   board = []
-  boardThrottleFn = throttle(500, this.calcBoard.bind(this))
+  boardThrottleFn = throttle(500, this.calcPlacement.bind(this))
   players = [
-    { id: 1, dist: 0, finish: 0, name: 'HoboJoe', color: '#F44336' },
-    { id: 2, dist: 0, finish: 0, name: 'AlasCanDo', color: '#4caf50' },
-    { id: 3, dist: 0, finish: 0, name: 'MerryBelle', color: '#00bcd4' },
-    { id: 4, dist: 0, finish: 0, name: 'FintelSpline', color: '#ffc107' },
-    { id: 5, dist: 0, finish: 0, name: 'NotAnother', color: '#3f51b5' },
-    { id: 6, dist: 0, finish: 0, name: 'DownWithRaces', color: '#e91e63' }
+    { id: 1, name: 'HoboJoe', color: '#F44336' },
+    { id: 2, name: 'AlasKCanDo', color: '#4caf50' },
+    { id: 3, name: 'LazyPalls', color: '#00bcd4' },
+    { id: 4, name: 'FingAround', color: '#ffc107' },
+    { id: 5, name: 'NotAnotherO', color: '#3f51b5' },
+    { id: 6, name: 'DownWithRaces', color: '#e91e63' }
   ]
   componentDidMount () {
-    this.calcBoard(this.players)
+    this.resetBoard()
   }
-  calcBoard (players) {
+  calcPlacement (players) {
     let board = [...players]
     board = board.sort((a, b) => a.dist - b.dist)
     this.board = board.reverse()
     this.setState({ board: this.board })
   }
-  update = (type, data) => {
+  resetBoard () {
+    this.players = this.players.map((n, i) => {
+      n.dist = 0
+      n.finish = 0
+      n.animate = 'ready'
+      return n
+    })
+    this.setState({ board: this.players })
+  }
+  update = (type, players) => {
     if (type === 'finish') {
       this.setState({ mode: 'finish' })
-      return
     }
-    this.boardThrottleFn(data)
+    if (type === 'order') {
+      this.boardThrottleFn(players)
+    }
+  }
+  setMode (mode) {
+    this.setState({ mode: mode })
   }
   handleClick = () => {
-    if (this.state.mode === 'ready') {
-      this.setState({ mode: 'start' })
-    }
-    if (this.state.mode === 'start') {
-      this.setState({ mode: 'stop' })
-    }
-    if (this.state.mode === 'stop') {
-      this.setState({ mode: 'start' })
-    }
-    if (this.state.mode === 'finish') {
-      this.players.map(n => {
-        n.dist = 0
-        n.finish = 0
-        n.animate = 'ready'
-        return n
-      })
-      this.setState({ mode: 'ready' })
+    switch (this.state.mode) {
+      case 'ready':
+        this.setMode('start')
+        break
+      case 'start':
+        this.setMode('stop')
+        break
+      case 'stop':
+        this.setMode('start')
+        break
+      case 'finish':
+        this.setMode('ready')
+        this.resetBoard()
+      default:
+        return
     }
   }
   render () {

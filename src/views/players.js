@@ -5,47 +5,47 @@ import Background from './background'
 class Players extends React.Component {
   constructor (props) {
     super()
-    this.players = props.players
     this.play = false
     this.fieldLength = 1000
+    this.simulateRate = 50
+    this.pcount = 0
   }
   componentDidMount () {
-    this.draw(this.setState.bind(this, { players: this.players }))
+    this.draw(this.setState.bind(this, { players: this.props.players }))
   }
   componentDidUpdate (previousProps) {
-    const { mode } = this.props
+    const { mode, update, players } = this.props
     if (previousProps.mode === 'ready' && mode === 'start') {
-      this.counter = this.props.players.length
+      this.pcount = players.length
       this.play = true
-      this.simulate(this.props.update)
+      this.simulate(update)
     }
     if (previousProps.mode === 'start' && mode === 'stop') {
       this.play = false
     }
     if (previousProps.mode === 'stop' && mode === 'start') {
       this.play = true
-      this.simulate(this.props.update)
+      this.simulate(update)
     }
     if (mode === 'finish') {
       this.play = false
     }
   }
   simulate (update) {
+    const { players } = this.props
     if (this.play) {
-      if (this.counter <= 0) {
-        update('finish', this.players)
+      if (this.pcount <= 0) {
+        update('finish', players)
       }
       setTimeout(() => {
-        const players = this.players
         const newPlayers = players.map(n => {
           if (n.dist >= this.fieldLength) {
-            if (n.finish === 0) {
-              //finisher get + placement points to determine winner
-              //incase of tie player with lowest index get the prize
-              n.dist = this.fieldLength + this.counter
-              this.counter = this.counter - 1
-              n.finish = `1-${Date.now()}`
-              n.animate = n.finish === 1 ? 'victory' : 'defeat'
+            if (!n.finish) {
+              //calculate placement and animation
+              n.dist = this.fieldLength + this.pcount
+              n.animate = this.pcount === players.length ? 'victory' : 'defeat'
+              n.finish = 1
+              this.pcount = this.pcount - 1
             }
           } else {
             n.dist = n.dist + Math.floor(Math.random() * 10)
@@ -54,9 +54,8 @@ class Players extends React.Component {
           return n
         })
         update('order', newPlayers)
-        //run the simulation again
         this.simulate(update)
-      }, 50)
+      }, this.simulateRate)
     }
   }
   draw (updater) {
