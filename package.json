@@ -1,0 +1,44 @@
+{
+  "name": "capy-race",
+  "author": "Jack Ton",
+  "license": "MIT",
+  "version": "0.1.0",
+  "dependencies": {
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "react-scripts": "2.1.2"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^6.0.1",
+    "node-sass": "^4.9.3",
+    "npm-run-all": "4.1.2",
+    "onchange": "^3.3.0",
+    "prettier-miscellaneous": "1.5.3",
+    "source-map-explorer": "^1.6.0"
+  },
+  "scripts": {
+    "start": "npm run start-dev",
+    "build": "npm run build-app",
+    "start-dev": "npm-run-all -p watch-css watch-js watch-prettier",
+    "build-app": "npm-run-all build-css build-js",
+    "build-js": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "watch-js": "cross-env react-scripts start",
+    "build-css": "node-sass --include-path ./node_modules src/styles/index.scss -o src/styles",
+    "watch-css": "onchange \"**/*.scss\" -- npm run build-css",
+    "watch-prettier": "onchange \"**/*.js\" \"**/*.scss\"   -- npm run start-prettier {{changed}}",
+    "start-prettier": "prettier --braces-spacing --no-bracket-spacing --jsx-single-quote --print-width 80 --no-semi --space-before-function-paren --single-quote --tab-width 2 --no-use-tabs --write",
+    "analyze": "source-map-explorer build/static/js/main.*"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
